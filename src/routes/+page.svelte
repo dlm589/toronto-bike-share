@@ -48,7 +48,7 @@
 
     onMount(async () => {
         // Load CSV data
-        csv = await d3.csv(`src/data/${sheet}.csv`);
+        csv = await d3.csv(`/data/${sheet}.csv`);
 
         // get the header of the csv
         header = Object.keys(csv[0])   
