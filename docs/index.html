@@ -5,27 +5,37 @@
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
-		<link rel="modulepreload" href="./_app/immutable/entry/start.D7PAuBku.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/entry.BGmvZSLg.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.BbrzlL2R.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/entry.B0-laWFJ.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.BvLojk_z.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.D0T6ktzG.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/index.3yJoD6ZP.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.w0FjLXKj.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/index.DmzJfg3g.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.CqgoPDoR.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.DQ2yE9lc.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">
+		<div style="display: contents">  <h1 data-svelte-h="svelte-yyjjjs">Welcome to SvelteKit</h1> <p data-svelte-h="svelte-jl9sbz">Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p> 
+			
 			<script>
 				{
-					__sveltekit_2vg4he = {
+					__sveltekit_thaxsh = {
 						base: new URL(".", location).pathname.slice(0, -1)
 					};
 
 					const element = document.currentScript.parentElement;
 
+					const data = [null,null];
+
 					Promise.all([
-						import("./_app/immutable/entry/start.D7PAuBku.js"),
-						import("./_app/immutable/entry/app.D0T6ktzG.js")
+						import("./_app/immutable/entry/start.BbrzlL2R.js"),
+						import("./_app/immutable/entry/app.w0FjLXKj.js")
 					]).then(([kit, app]) => {
-						kit.start(app, element);
+						kit.start(app, element, {
+							node_ids: [0, 2],
+							data,
+							form: null,
+							error: null
+						});
 					});
 				}
 			</script>
