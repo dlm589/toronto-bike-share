@@ -154,8 +154,8 @@
                     //console.log(i,bikes0521.features[i].properties.Name)
                     stationNames.push(bikes0521.features[i].properties.Name)
                 }
+                
                 stationIndex = stationNames.indexOf(station)
-                console.log(stationIndex)
                 bikecount = bikes0521.features[stationIndex].properties[daytime]
             });
     });
