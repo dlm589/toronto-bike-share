@@ -196,13 +196,14 @@
           on:mouseout={() => (thumbHover = false)}
         >
           {#if holding || thumbHover}
+            <!--
             <div
               class="range__tooltip"
               in:fly={{ y: 7, duration: 200 }}
               out:fade={{ duration: 100 }}
             >
               {value}
-            </div>
+            </div>-->
           {/if}
         </div>
       </div>
