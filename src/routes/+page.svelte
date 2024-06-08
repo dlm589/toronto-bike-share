@@ -2,74 +2,114 @@
     import { onMount } from "svelte";
     import maplibregl from "maplibre-gl";
     import map_styles from "../lib/map-styles.json";
-    import stations from "../data/Stations.geo.json";
-    import bikeshare from "../data/Stations.geo.json"
+    import Range from "../lib/Range.svelte";
+    //import stations from "../data/Stations.geo.json";
+    //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
+    import bikes0521 from "../data/0521_num_bikes_available.geo.json"
+    import bikes0522 from "../data/0522_num_bikes_available.geo.json"
+    import bikes0523 from "../data/0523_num_bikes_available.geo.json"
+    import bikes0524 from "../data/0524_num_bikes_available.geo.json"
+    import bikes0525 from "../data/0525_num_bikes_available.geo.json"
+    import bikes0526 from "../data/0526_num_bikes_available.geo.json"
+    
 
-    let sheet = "num_bikes_available";
-    let day = "0521";
     let days = ["0521", "0522", "0523", "0524", "0525", "0526"]
-    let selectedDay = ""
-    let capacity
-    let station
+    let selectedDay = "0521"
+    let station = "Union Station";
+    let capacity = 43
 
-    let value;
-
-    let time = "1200";
+    let daytime = "0521_0000"
+    let bikecount;
+    
     let map;
-    let header = [];
-    let csv = [];
-    let dataLoaded= false
-
-    // Esri color ramps - Heatmap 1
+    let values = 0;
+	let theme = "default";
+    let stationNames = []
+    let stationIndex
+    let hourMinutes = "00 : 00"
     const colors = ["#85c1c8ff", "#90a1beff", "#9c8184ff", "#a761aaff", "#af4980ff", "#b83055ff", "#c0182aff", "#c80000ff", "#d33300ff", "#de6600ff", "#e99900ff", "#f4cc00ff", "#ffff00ff"];
-    // this is for handling the imported data and joining with the GIS layer
-    async function handleCsvData(csv, header, day) {
-        // Assuming 'MUNID' is the common key and find the index of regional and municipal layer count
-        console.log(header)
-        for (let i = 1; i < 1729; i++){
-            let date = header[i].split("_")[0]
+    const bikeshare = {
+        "0521" : bikes0521,
+        "0522" : bikes0522,
+        "0523" : bikes0523,
+        "0524" : bikes0524,
+        "0525" : bikes0525,
+        "0526" : bikes0526
+    }
+    let circlecolor_perc = [
+        "interpolate",
+        ["linear"],
+        //["get", daytime], 
+        ['/', ['get', daytime], ['get', 'Capacity']],
+        0, colors[0], 
+        0.10, colors[3], 0.20, colors[4], 0.30, colors[5], 
+        0.40, colors[6], 0.50, colors[7], 0.60, colors[8], 0.70, colors[9], 
+        0.80, colors[10], 0.90, colors[11], 
+        1.00, colors[12]]
+    let circlecolor_count = [
+        "interpolate",
+        ["linear"],
+        ["get", daytime],
+        0, colors[0], 5, colors[3], 10, colors[4], 15, colors[5], 20, colors[6],
+        25, colors[7], 30, colors[8], 35, colors[9], 40, colors[10], 45, colors[11],
+        50, colors[12]]
 
-            if (date == day){
-                //const commonField = header.indexOf(`${day}_${time}`);
-                const commonField = header.indexOf(header[i]);
-                stations.features.forEach((feature) => {
-                // Find matching record in CSV data
-                const matchingRecord = csv.find(
-                    (obj) => obj['Station ID'] === feature.properties['Station ID'],
-                );
-                // If a match is found, update GeoJSON properties with CSV data
-                if (matchingRecord) {
-                    //console.log(parseInt(matchingRecord[`${day}_${time}`]))
-                    //console.log(matchingRecord[`${day}_${time}`]/matchingRecord["Capacity"]*100)
-                    //feature.properties[header[commonField]] = Math.round(matchingRecord[`${day}_${time}`]/matchingRecord["Capacity"]*10000)/100;
-                    feature.properties[header[commonField]] = +matchingRecord[header[i]];
-
-                }
-            })
-            }
-
-            
-        } 
+    async function dayDropDown(){
+        //console.log(selectedDay)
         
+        map.getSource("station").setData(bikeshare[selectedDay]);
+        var hr = daytime.split("_")[1]
+        daytime = `${selectedDay}_${hr}`
+        //console.log(hr)
+        //console.log(daytime)
     }
 
-    function dayDropDown(){
+    function valueTime(value, day){
 
+        const hours = Math.floor(value*5 / 60);
+        const minutes = value*5 % 60;
+        if (minutes <10 && hours <10){
+            hourMinutes = `0${hours} : 0${minutes}`
+            daytime = `${day}_0${hours}0${minutes}`
+            circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
+        } else if (minutes < 10){
+            hourMinutes = `${hours} : 0${minutes}`
+            daytime = `${day}_${hours}0${minutes}`
+            circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
+        } else if (hours < 10){
+            hourMinutes = `0${hours} : ${minutes}`
+            daytime = `${day}_0${hours}${minutes}`
+            circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
+        } else {
+            hourMinutes = `${hours} : ${minutes}`
+            daytime = `${day}_${hours}${minutes}`
+            circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
+        }
+
+        bikecount = bikeshare[selectedDay].features[stationIndex].properties[daytime]
+        console.log(bikecount)
+        map.setPaintProperty("bike-count", 'circle-radius', 5);
+        map.setPaintProperty("bike-count", 'circle-color', circlecolor_perc);
+        map.setPaintProperty("bike-count", 'circle-opacity', 0.7);
+
+        //console.log(daytime)
+
+        return hourMinutes
     }
-
 
     onMount(async () => {
         // Load CSV data
-        csv = await d3.csv(`data/${sheet}.csv`);
-        console.log(csv)
+        ///csv = await d3.csv(`data/${sheet}.csv`);
+        //console.log(csv)
 
         // get the header of the csv
-        header = Object.keys(csv[0])   
-        dataLoaded = handleCsvData(csv, header, day)
+        //header = Object.keys(csv[0])   
+        //dataLoaded = handleCsvData(csv, header, day)
 
-        console.log(stations)
-
+        //console.log(csv[0]["Station ID"])
+        console.log(bikes0521)
+            
             map = new maplibregl.Map({
                 container: "map",
                 style: map_styles, //'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
@@ -79,91 +119,63 @@
                 scrollZoom: true,
                 attributionControl: false,
             });
-        //console.log(csv[0]["Station ID"])
-        if (dataLoaded){
-            
-        
-            console.log(stations)
+
+            //console.log(stations)
             map.on("load", () => {
                 //adding the station, the data is determined either the "origin" or "destination" data input.
                 map.addSource("station", {
                     type: "geojson",
-                    data: stations,
+                    data: bikes0521,
                 });
-                /*map.addLayer({id: "bike-capacity-percentage",
-                    type: "circle",
-                    source: "station",
-                    paint: {
-                        "circle-radius": 5,
-                        "circle-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", `${day}_${time}`],
-                            0, colors[0],
-                            10, colors[3],
-                            20, colors[4],
-                            30, colors[5],
-                            40, colors[6],
-                            50, colors[7],
-                            60, colors[8],
-                            70, colors[9],
-                            80, colors[10],
-                            90, colors[11],
-                            100, colors[12]
-                        ],
-                        "circle-opacity": 0.7,
-                        //"circle-stroke-color": "white",
-                        //"circle-stroke-width": 2,
-                    },
-                });*/
+                
                 map.addLayer({id: "bike-count",
                 type: "circle",
                     source: "station",
                     paint: {
                         "circle-radius": 5,
-                        "circle-color": [
-                            "interpolate",
-                            ["linear"],
-                            ["get", `${day}_${time}`],
-                            0, colors[0],
-                            5, colors[3],
-                            10, colors[4],
-                            15, colors[5],
-                            20, colors[6],
-                            25, colors[7],
-                            30, colors[8],
-                            35, colors[9],
-                            40, colors[10],
-                            45, colors[11],
-                            50, colors[12]
-                        ],
+                        "circle-color": circlecolor_perc,
                         "circle-opacity": 0.7
                     },
                 });
 
-
-                map.on("mouseenter", "bike-count", (e) => {
-                    map.getCanvas().style.cursor = "pointer";
-                    console.log(e.features[0].properties[`${day}_${time}`])
+                map.on("click", "bike-count", (e) => {
                     station = e.features[0].properties['Name']
                     capacity = e.features[0].properties['Capacity']
-                    value = e.features[0].properties[`${day}_${time}`]
+                    bikecount = e.features[0].properties[daytime]
                 });
-
+                map.on("mouseenter", "bike-count", (e) => {
+                    map.getCanvas().style.cursor = "pointer";
+                });
                 map.on("mouseleave", "bike-count", () => {
                     map.getCanvas().style.cursor = "";
                 });
-            });
 
-        }
+                for (let i = 0; i < bikes0521.features.length; i++){
+                    //console.log(i,bikes0521.features[i].properties.Name)
+                    stationNames.push(bikes0521.features[i].properties.Name)
+                }
+                stationIndex = stationNames.indexOf(station)
+                console.log(stationIndex)
+                bikecount = bikes0521.features[stationIndex].properties[daytime]
+            });
     });
 </script>
 
 <div id="map" class="map" />
 
 <div class = "info-panel">
-    <h1>{station}: {value}</h1>
-    <h2>Capacity: {capacity}</h2>
+    <h1>{station} at {hourMinutes}: </h1>
+    <h2>{bikecount} / {capacity} ({Math.round(bikecount/capacity*10000)/100}%) </h2>
+
+    <!-- Slider -->
+    <div class:purple-theme={theme === "default"}>
+        <Range on:change={(e) => {
+            values = e.detail.value
+            valueTime(values, selectedDay)
+            }} 
+            id="basic-slider" />
+    </div>
+
     <div id="select-wrapper">
         <select bind:value={selectedDay} on:change={dayDropDown}>
             {#each days as day}
@@ -189,20 +201,21 @@
         left: 0;
         background-color: yellow;
         position: absolute;
+        overflow-x: hidden;
 
     }
     select {
-    width: 25vw;
-    height: 25px;
-    font-family: TradeGothicBold;
-    font-size: 16px;
-    color: #6d247a;
-    border-width: 0px;
-    margin-right: 5px;
-    padding-left: 10px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    border-radius: 0;
-    border: 1px;
+        width: 25vw;
+        height: 25px;
+        font-family: TradeGothicBold;
+        font-size: 16px;
+        color: #6d247a;
+        border-width: 0px;
+        margin-right: 5px;
+        padding-left: 10px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        border-radius: 0;
+        border: 1px;
   }
 </style>
