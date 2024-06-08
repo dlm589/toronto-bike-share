@@ -2,24 +2,34 @@
     import { onMount } from "svelte";
     import maplibregl from "maplibre-gl";
     import map_styles from "../lib/map-styles.json";
-    import stations from "../data/Stations.geo.json";
-    import bikeshare from "../data/Stations.geo.json"
+    import Range from "../lib/Range.svelte";
+    //import stations from "../data/Stations.geo.json";
+    //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
+    import bikes0521 from "../data/0521_num_bikes_available.geo.json"
+    import bikes0522 from "../data/0522_num_bikes_available.geo.json"
+    import bikes0523 from "../data/0523_num_bikes_available.geo.json"
+    import bikes0524 from "../data/0524_num_bikes_available.geo.json"
+    import bikes0525 from "../data/0525_num_bikes_available.geo.json"
+    import bikes0526 from "../data/0526_num_bikes_available.geo.json"
 
     let sheet = "num_bikes_available";
     let day = "0521";
     let days = ["0521", "0522", "0523", "0524", "0525", "0526"]
-    let selectedDay = ""
-    let capacity
+    let chosenDate = ["0521"]
+    let selectedDay = "0521"
     let station
 
     let value;
-
-    let time = "1200";
+    let capacity;
+    let time = "0000";
     let map;
     let header = [];
     let csv = [];
-    let dataLoaded= false
+    let dataLoaded= true
+    let valuetime; 
+    let values = 42;
+	let theme = "default";
 
     // Esri color ramps - Heatmap 1
     const colors = ["#85c1c8ff", "#90a1beff", "#9c8184ff", "#a761aaff", "#af4980ff", "#b83055ff", "#c0182aff", "#c80000ff", "#d33300ff", "#de6600ff", "#e99900ff", "#f4cc00ff", "#ffff00ff"];
@@ -44,32 +54,55 @@
                     //console.log(matchingRecord[`${day}_${time}`]/matchingRecord["Capacity"]*100)
                     //feature.properties[header[commonField]] = Math.round(matchingRecord[`${day}_${time}`]/matchingRecord["Capacity"]*10000)/100;
                     feature.properties[header[commonField]] = +matchingRecord[header[i]];
-
                 }
             })
             }
-
-            
         } 
         
     }
 
-    function dayDropDown(){
+    async function dayDropDown(){
+        console.log(selectedDay)
+        if (!chosenDate.includes(selectedDay)){ // if selectedDay not in chosenDate, add
+            chosenDate.push(selectedDay)
+            dataLoaded = handleCsvData(csv, header, selectedDay)
+            console.log(stations)   
+        }
+        console.log(chosenDate)
 
     }
 
+    function valueTime(value){
+        valuetime = value*5
+
+        const hours = Math.floor(valuetime / 60);
+        const minutes = valuetime % 60;
+        if (minutes <10 && hours <10){
+            var hourMinutes = `0${hours} : 0${minutes}`
+        } else if (minutes < 10){
+            var hourMinutes = `${hours} : 0${minutes}`
+        } else if (hours < 10){
+            var hourMinutes = `0${hours} : ${minutes}`
+        } else {
+            var hourMinutes = `${hours} : ${minutes}`
+        }
+        
+
+        return hourMinutes
+    }
 
     onMount(async () => {
         // Load CSV data
-        csv = await d3.csv(`data/${sheet}.csv`);
-        console.log(csv)
+        ///csv = await d3.csv(`data/${sheet}.csv`);
+        //console.log(csv)
 
         // get the header of the csv
-        header = Object.keys(csv[0])   
-        dataLoaded = handleCsvData(csv, header, day)
+        //header = Object.keys(csv[0])   
+        //dataLoaded = handleCsvData(csv, header, day)
 
-        console.log(stations)
-
+        //console.log(csv[0]["Station ID"])
+        console.log(bikes0521)
+            
             map = new maplibregl.Map({
                 container: "map",
                 style: map_styles, //'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
@@ -79,16 +112,13 @@
                 scrollZoom: true,
                 attributionControl: false,
             });
-        //console.log(csv[0]["Station ID"])
-        if (dataLoaded){
-            
-        
-            console.log(stations)
+
+            //console.log(stations)
             map.on("load", () => {
                 //adding the station, the data is determined either the "origin" or "destination" data input.
                 map.addSource("station", {
                     type: "geojson",
-                    data: stations,
+                    data: bikes0521,
                 });
                 /*map.addLayer({id: "bike-capacity-percentage",
                     type: "circle",
@@ -140,8 +170,6 @@
                         "circle-opacity": 0.7
                     },
                 });
-
-
                 map.on("mouseenter", "bike-count", (e) => {
                     map.getCanvas().style.cursor = "pointer";
                     console.log(e.features[0].properties[`${day}_${time}`])
@@ -149,13 +177,10 @@
                     capacity = e.features[0].properties['Capacity']
                     value = e.features[0].properties[`${day}_${time}`]
                 });
-
                 map.on("mouseleave", "bike-count", () => {
                     map.getCanvas().style.cursor = "";
                 });
             });
-
-        }
     });
 </script>
 
@@ -164,6 +189,15 @@
 <div class = "info-panel">
     <h1>{station}: {value}</h1>
     <h2>Capacity: {capacity}</h2>
+    <h3>{valueTime(values)} </h3>
+
+    <!-- Slider -->
+    <div class:purple-theme={theme === "purple"}>
+        <label for="basic-range">Range Label</label>
+        <Range on:change={(e) => values = e.detail.value} id="basic-slider" />
+            {console.log(values)}
+    </div>
+
     <div id="select-wrapper">
         <select bind:value={selectedDay} on:change={dayDropDown}>
             {#each days as day}
@@ -192,17 +226,17 @@
 
     }
     select {
-    width: 25vw;
-    height: 25px;
-    font-family: TradeGothicBold;
-    font-size: 16px;
-    color: #6d247a;
-    border-width: 0px;
-    margin-right: 5px;
-    padding-left: 10px;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    border-radius: 0;
-    border: 1px;
+        width: 25vw;
+        height: 25px;
+        font-family: TradeGothicBold;
+        font-size: 16px;
+        color: #6d247a;
+        border-width: 0px;
+        margin-right: 5px;
+        padding-left: 10px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        border-radius: 0;
+        border: 1px;
   }
 </style>
