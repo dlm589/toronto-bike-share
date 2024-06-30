@@ -3,7 +3,7 @@
     import maplibregl from "maplibre-gl";
     import map_styles from "../lib/map-styles.json";
     import Range from "../lib/Range.svelte";
-    import Chart from "../lib/Chart.svelte";
+    import Chart from "../lib/Charts.svelte";
     //import stations from "../data/Stations.geo.json";
     //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
@@ -190,15 +190,17 @@
             {/each}
         </select>
     </div>
-    {#key stationIndex}
+    
+    {#key stationIndex, bikeshare[selectedDay]}
     <Chart on:change = {(e) => console.log(e)}
         index= {stationIndex}
-        data = {bikes0521}
+        data = {bikeshare[selectedDay]}
         yTicks={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
         colour="#F1C500"
         maxHeight="250"
         type="line"
         time = {daytime}
+        capacity = {capacity}
     />
     {/key}
 </div>
