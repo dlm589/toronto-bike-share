@@ -222,6 +222,7 @@
         background-color: #ACD4D6;
         position: absolute;
         overflow-x: hidden;
+
         
 
     }
