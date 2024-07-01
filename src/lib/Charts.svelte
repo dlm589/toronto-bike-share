@@ -46,38 +46,10 @@
     $: height = Math.min(width / 2.42, maxHeight);
 
     const padding = { top: 20, right: 25, bottom: 35, left: 15};
-    /*  
-    var timeList = data.map(function (obj) {
-        return obj[time];
-    });
-    
-    var variableList = data.map(function (obj) {
-        return obj[variable];
-    });
-
-    const xTicks = timeList;
-    const padding = { top: 20, right: 25, bottom: 35, left: 15 };
-
-    function formatMobile(tick) {
-        return "'" + tick.toString().slice(-2);
-    }
-    
-    // converts thousands and million to K and M i.e. (1,000 ==> 1K , 1,000,000 ==> 1M)
-    function thousandToK(tick) {
-        var newtick;
-        if (tick >= 1000 && tick < 1000000) {
-            newtick = tick / 1000 + "K";
-        } else if (tick > 1000000) {
-            newtick = tick / 1000000 + "M";
-        } else {
-            newtick = tick;
-        }
-        return newtick;
-    }*/
 
     $: xScale = scaleLinear()
         .domain([0, minutes.length])
-        .range([padding.left, width - padding.right]);
+        .range([padding.left, 1700]);
 
     $: yScale = scaleLinear()
         .domain([0, Math.max.apply(0, yTicks)])
@@ -85,7 +57,7 @@
 
     $: innerWidth = width - (padding.left + padding.right);
 
-    $: barWidth = Math.max(Math.min(innerWidth / xTicks.length, 9), 10);
+    $: barWidth = Math.max(Math.min(innerWidth / xTicks.length, 9), 14);
 
     let selected_datapoint = undefined;
     let selected_datapoint_i = undefined;
@@ -96,19 +68,19 @@
         mouse_y = event.clientY;
     };
 
-    var barPadding = 13; // controls how much spacing the bars will be from the
+    var barPadding = 10; // controls how much spacing the bars will be from the
     
 </script>
-
+<div class = "chart-container">
 <div id="barchart" class="chart" bind:clientWidth={width}>
     <svg width={xTicks.length * barWidth} {height}>
         <g class="year-tick">
             {#each hour as hr, i} 
                 <line
                     class="year-grid"
-                    x1={xScale(i*6) + barPadding - innerWidth / 600}
+                    x1={xScale(i*6*1.7) + barPadding}
                     y1={height - 3}
-                    x2={xScale(i*6) + barPadding - innerWidth / 600}
+                    x2={xScale(i*6*1.7) + barPadding}
                     y2={0}
                     stroke-width={1}
                     stroke="black"
@@ -123,7 +95,7 @@
                     class="tick"
                 >
                     <text 
-                        x={xScale(i*6) + 10 + barPadding - innerWidth / 600}
+                        x={xScale(i*6*1.7) + 13 + barPadding - innerWidth / 600}
                         y={height - 5}
                         text-anchor=end
                     >
@@ -140,9 +112,9 @@
 
                 <g
                     class="tick"
-                    transform="translate({xScale(i)},{height})"
+                    transform="translate({xScale(i*1.7)},{height})"
                 >
-                    <text x={barWidth / 2 + 13} y="-20"
+                    <text x={barWidth / 2 + 10} y="-20"
                         >{mn}</text
                     >
                 </g>
@@ -156,7 +128,7 @@
                 {#each values as value, i}
                     <rect
                         class="bar"
-                        x={xScale(i) + barPadding}
+                        x={xScale(i*1.7) + barPadding}
                         y={yScale(value/capacity)}
                         width={barWidth - 2}
                         height={yScale(0) - yScale(value/capacity)}
@@ -172,7 +144,7 @@
                     />
                     <rect
                             class="barLight"
-                            x={xScale(i) + barPadding}
+                            x={xScale(i*1.7) + barPadding}
                             y={yScale(value)}
                             width={barWidth - 2}
                             height={yScale(0) - yScale(value/capacity)}
@@ -266,7 +238,7 @@
     </svg>
    
 </div>
-
+</div>
 
 
 <div id="hoverLabel">
@@ -282,13 +254,16 @@
 
 
 <style>
+    .chart-container {
+        overflow-x: auto;
+    }
     .chart {
         width: 100%;
-        max-width: 100%;
         min-width: 300px;
         margin: 0 auto;
         margin-left: 10px;
         margin-right: 10px;
+
         
     }
     #hoverLabel {
@@ -309,7 +284,7 @@
 
     svg {
         position: relative;
-        width: 100%;
+
     }
 
     .tick {
