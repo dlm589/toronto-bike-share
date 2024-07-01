@@ -3,6 +3,7 @@
     import maplibregl from "maplibre-gl";
     import map_styles from "../lib/map-styles.json";
     import Range from "../lib/Range.svelte";
+    import Chart from "../lib/Charts.svelte";
     //import stations from "../data/Stations.geo.json";
     //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
@@ -26,7 +27,7 @@
     let values = 0;
 	let theme = "default";
     let stationNames = []
-    let stationIndex
+    let stationIndex = 31
     let hourMinutes = "00 : 00"
     const colors = ["#85c1c8ff", "#90a1beff", "#9c8184ff", "#a761aaff", "#af4980ff", "#b83055ff", "#c0182aff", "#c80000ff", "#d33300ff", "#de6600ff", "#e99900ff", "#f4cc00ff", "#ffff00ff"];
     const bikeshare = {
@@ -59,13 +60,14 @@
         //console.log(selectedDay)
         
         map.getSource("station").setData(bikeshare[selectedDay]);
+        
         var hr = daytime.split("_")[1]
         daytime = `${selectedDay}_${hr}`
         //console.log(hr)
         //console.log(daytime)
     }
 
-    function valueTime(value, day){
+    function valueTime(value, day, station){
 
         const hours = Math.floor(value*5 / 60);
         const minutes = value*5 % 60;
@@ -84,11 +86,12 @@
         } else {
             hourMinutes = `${hours} : ${minutes}`
             daytime = `${day}_${hours}${minutes}`
+            
             circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
         }
-
+        stationIndex = stationNames.indexOf(station)
         bikecount = bikeshare[selectedDay].features[stationIndex].properties[daytime]
-        console.log(bikecount)
+
         map.setPaintProperty("bike-count", 'circle-radius', 5);
         map.setPaintProperty("bike-count", 'circle-color', circlecolor_perc);
         map.setPaintProperty("bike-count", 'circle-opacity', 0.7);
@@ -140,8 +143,10 @@
 
                 map.on("click", "bike-count", (e) => {
                     station = e.features[0].properties['Name']
+                    console.log(station)
                     capacity = e.features[0].properties['Capacity']
                     bikecount = e.features[0].properties[daytime]
+                    stationIndex = stationNames.indexOf(station)
                 });
                 map.on("mouseenter", "bike-count", (e) => {
                     map.getCanvas().style.cursor = "pointer";
@@ -154,8 +159,8 @@
                     //console.log(i,bikes0521.features[i].properties.Name)
                     stationNames.push(bikes0521.features[i].properties.Name)
                 }
+
                 stationIndex = stationNames.indexOf(station)
-                console.log(stationIndex)
                 bikecount = bikes0521.features[stationIndex].properties[daytime]
             });
     });
@@ -171,11 +176,12 @@
     <div class:purple-theme={theme === "default"}>
         <Range on:change={(e) => {
             values = e.detail.value
-            valueTime(values, selectedDay)
+            console.log(values)
+            valueTime(values, selectedDay, station)
             }} 
             id="basic-slider" />
     </div>
-
+    
     <div id="select-wrapper">
         <select bind:value={selectedDay} on:change={dayDropDown}>
             {#each days as day}
@@ -183,11 +189,25 @@
             {/each}
         </select>
     </div>
+    
+    {#key stationIndex, bikeshare[selectedDay]}
+    <Chart on:change = {(e) => console.log(e)}
+        index= {stationIndex}
+        data = {bikeshare[selectedDay]}
+        yTicks={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+        colour="#F1C500"
+        maxHeight="250"
+        type="line"
+        time = {daytime}
+        capacity = {capacity}
+    />
+    {/key}
+    
 </div>
 
 <style>
     .map {
-        height: 75vh;
+        height: 55vh;
         width: 100vw;
         top: 0;
         left: 0%;
@@ -195,13 +215,14 @@
         overflow: hidden;
     }
     .info-panel {
-        height: 25vh;
+        height: 45vh;
         width: 100vw;
-        top: 75vh;
+        top: 55vh;
         left: 0;
-        background-color: yellow;
+        background-color: #ACD4D6;
         position: absolute;
         overflow-x: hidden;
+        
 
     }
     select {
@@ -212,10 +233,17 @@
         color: #6d247a;
         border-width: 0px;
         margin-right: 5px;
+        margin-left: 10px;
         padding-left: 10px;
         padding-top: 3px;
         padding-bottom: 3px;
         border-radius: 0;
         border: 1px;
+  }
+  h1 {
+    margin-left: 10px;
+  }
+  h2{
+    margin-left: 10px;
   }
 </style>
