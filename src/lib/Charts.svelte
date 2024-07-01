@@ -22,44 +22,24 @@
     var hour = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
     var minutes = []
 
-    xTicks.forEach((e)=>{
-        minutes.push(e.substring(6,8))
+    xTicks.forEach((e, i)=>{
+        if (i%2 ===0){
+            console.log(i, e, e.substring(7,8))
+            minutes.push(e.substring(7,8))
+        }
+
+    })
+    console.log(minutes)
+
+    var valueList = Object.values(features.properties)
+    valueList.splice(valueList.length -2, 2)
+    var values = []
+    valueList.forEach((e, i) =>{
+        if (i%2 === 0){
+            values.push(e)
+        }
     })
 
-    var values = Object.values(features.properties)
-    values.splice(values.length -2, 2) //remove name and capacity from the list 
-
-    
-    const monthCodes = {
-        "1": "J",
-        "2": "F",
-        "3": "M",
-        "4": "A",
-        "5": "M",
-        "6": "J",
-        "7": "J",
-        "8": "A",
-        "9": "S",
-        "10": "O",
-        "11": "N",
-        "12": "D"
-    }
-
-    const monthCodesFull = {
-        "1": "January",
-        "2": "February",
-        "3": "March",
-        "4": "April",
-        "5": "May",
-        "6": "June",
-        "7": "July",
-        "8": "August",
-        "9": "September",
-        "10": "October",
-        "11": "November",
-        "12": "December"
-    }
-    
     let width = 100;
     let height = 60;
     
@@ -96,7 +76,7 @@
     }*/
 
     $: xScale = scaleLinear()
-        .domain([0, xTicks.length])
+        .domain([0, minutes.length])
         .range([padding.left, width - padding.right]);
 
     $: yScale = scaleLinear()
@@ -105,7 +85,7 @@
 
     $: innerWidth = width - (padding.left + padding.right);
 
-    $: barWidth = Math.max(Math.min(innerWidth / xTicks.length, 9), 6);
+    $: barWidth = Math.max(Math.min(innerWidth / xTicks.length, 9), 10);
 
     let selected_datapoint = undefined;
     let selected_datapoint_i = undefined;
@@ -116,34 +96,34 @@
         mouse_y = event.clientY;
     };
 
-    var barPadding = 10; // controls how much spacing the bars will be from the
+    var barPadding = 13; // controls how much spacing the bars will be from the
     
 </script>
 
 <div id="barchart" class="chart" bind:clientWidth={width}>
     <svg width={xTicks.length * barWidth} {height}>
-        <!--<g class="year-tick">
+        <g class="year-tick">
             {#each hour as hr, i} 
                 <line
                     class="year-grid"
-                    x1={xScale(i) + barPadding - innerWidth / 600}
+                    x1={xScale(i*6) + barPadding - innerWidth / 600}
                     y1={height - 3}
-                    x2={xScale(i) + barPadding - innerWidth / 600}
+                    x2={xScale(i*6) + barPadding - innerWidth / 600}
                     y2={0}
                     stroke-width={1}
-                    stroke="#fff"
+                    stroke="black"
                     stroke-dasharray="5 3"
                     opacity="0.5"
                 />
             {/each}
-        </g>-->
+        </g>
         <g class="axis x-axis">
             {#each hour as hr, i}
                 <g
                     class="tick"
                 >
                     <text 
-                        x={xScale(i*12) + 17 + barPadding - innerWidth / 600}
+                        x={xScale(i*6) + 10 + barPadding - innerWidth / 600}
                         y={height - 5}
                         text-anchor=end
                     >
@@ -181,7 +161,7 @@
                         width={barWidth - 2}
                         height={yScale(0) - yScale(value/capacity)}
                         on:mouseover={(event) => {
-                            selected_datapoint = min;
+                            selected_datapoint = value;
                             selected_datapoint_i = i;
                             // setMousePosition(event);
                         }}
@@ -190,6 +170,23 @@
                         }}
                         color={colour}
                     />
+                    <rect
+                            class="barLight"
+                            x={xScale(i) + barPadding}
+                            y={yScale(value)}
+                            width={barWidth - 2}
+                            height={yScale(0) - yScale(value/capacity)}
+                            stroke={colour}
+                            opacity=0.15
+                            on:mouseover={(event) => {
+                                selected_datapoint = value;
+                                setMousePosition(event);
+                                selected_datapoint_i = i;
+                            }}
+                            on:mouseout={() => {
+                                selected_datapoint = undefined;
+                            }}
+                        />
                 
 
                  {/each}
@@ -205,8 +202,9 @@
                     transform="translate(0, {yScale(tick)})"
                 >
                     <line x2="100%" />
-                    <text y="-4">{tick} </text>
+                    <text y="20">{tick} </text>
                 </g>
+                
             {/each}
         </g>
         <!--
@@ -270,16 +268,16 @@
 </div>
 
 
- <!--
+
 <div id="hoverLabel">
     <p>
         {#if selected_datapoint != undefined}
-        {monthCodesFull[selected_datapoint.Month] + " " + selected_datapoint.Year.toString().toLocaleString()
+        {minutes[selected_datapoint_i] 
         }:
-        <span id="lightBlue">{selected_datapoint[variable].toLocaleString()}</span>
+        <span id="lightBlue">{values[selected_datapoint_i]}</span>
         {/if}
     </p>
-</div> -->
+</div>
 
 
 
@@ -289,6 +287,9 @@
         max-width: 100%;
         min-width: 300px;
         margin: 0 auto;
+        margin-left: 10px;
+        margin-right: 10px;
+        
     }
     #hoverLabel {
         height: 30px;

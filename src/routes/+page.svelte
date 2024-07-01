@@ -171,7 +171,6 @@
 <div class = "info-panel">
     <h1>{station} at {hourMinutes}: </h1>
     <h2>{bikecount} / {capacity} ({Math.round(bikecount/capacity*10000)/100}%) </h2>
-    <h3>{stationIndex}</h3>
 
     <!-- Slider -->
     <div class:purple-theme={theme === "default"}>
@@ -182,7 +181,7 @@
             }} 
             id="basic-slider" />
     </div>
-
+    
     <div id="select-wrapper">
         <select bind:value={selectedDay} on:change={dayDropDown}>
             {#each days as day}
@@ -203,11 +202,12 @@
         capacity = {capacity}
     />
     {/key}
+    
 </div>
 
 <style>
     .map {
-        height: 75vh;
+        height: 55vh;
         width: 100vw;
         top: 0;
         left: 0%;
@@ -215,13 +215,14 @@
         overflow: hidden;
     }
     .info-panel {
-        height: 25vh;
+        height: 45vh;
         width: 100vw;
-        top: 75vh;
+        top: 55vh;
         left: 0;
-        background-color: yellow;
+        background-color: #ACD4D6;
         position: absolute;
         overflow-x: hidden;
+        
 
     }
     select {
@@ -232,6 +233,7 @@
         color: #6d247a;
         border-width: 0px;
         margin-right: 5px;
+        margin-left: 10px;
         padding-left: 10px;
         padding-top: 3px;
         padding-bottom: 3px;
