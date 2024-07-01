@@ -29,7 +29,10 @@
     let stationNames = []
     let stationIndex = 31
     let hourMinutes = "00 : 00"
-    const colors = ["#85c1c8ff", "#90a1beff", "#9c8184ff", "#a761aaff", "#af4980ff", "#b83055ff", "#c0182aff", "#c80000ff", "#d33300ff", "#de6600ff", "#e99900ff", "#f4cc00ff", "#ffff00ff"];
+    //const colors = ["#85c1c8ff", "#90a1beff", "#9c8184ff", "#a761aaff", "#af4980ff", "#b83055ff", "#c0182aff", "#c80000ff", "#d33300ff", "#de6600ff", "#e99900ff", "#f4cc00ff", "#ffff00ff"];
+
+    // #67001fff,#b2182bff,#d6604dff,#f4a582ff,#fddbc7ff,#f7f7f7ff,#d1e5f0ff,#92c5deff,#4393c3ff,#2166acff,#053061ff
+    const colors = ["#67001fff", "#b2182bff", "#d6604dff", "#f4a582ff", "#fddbc7ff", "#f7f7f7ff", "#d1e5f0ff", "#92c5deff", "#4393c3ff", "#2166acff", "#053061ff"];
     const bikeshare = {
         "0521" : bikes0521,
         "0522" : bikes0522,
@@ -44,17 +47,17 @@
         //["get", daytime], 
         ['/', ['get', daytime], ['get', 'Capacity']],
         0, colors[0], 
-        0.10, colors[3], 0.20, colors[4], 0.30, colors[5], 
-        0.40, colors[6], 0.50, colors[7], 0.60, colors[8], 0.70, colors[9], 
-        0.80, colors[10], 0.90, colors[11], 
-        1.00, colors[12]]
+        0.10, colors[1], 0.20, colors[2], 0.30, colors[3], 
+        0.40, colors[4], 0.50, colors[5], 0.60, colors[6], 0.70, colors[7], 
+        0.80, colors[8], 0.90, colors[9], 
+        1.00, colors[10]]
     let circlecolor_count = [
         "interpolate",
         ["linear"],
         ["get", daytime],
-        0, colors[0], 5, colors[3], 10, colors[4], 15, colors[5], 20, colors[6],
-        25, colors[7], 30, colors[8], 35, colors[9], 40, colors[10], 45, colors[11],
-        50, colors[12]]
+        0, colors[0], 5, colors[1], 10, colors[2], 15, colors[3], 20, colors[4],
+        25, colors[5], 30, colors[6], 35, colors[7], 40, colors[8], 45, colors[9],
+        50, colors[10]]
 
     async function dayDropDown(){
         //console.log(selectedDay)
@@ -194,7 +197,7 @@
     <Chart on:change = {(e) => console.log(e)}
         index= {stationIndex}
         data = {bikeshare[selectedDay]}
-        yTicks={[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
+        yTicks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
         colour="#F1C500"
         maxHeight="250"
         type="line"
@@ -219,7 +222,7 @@
         width: 100vw;
         top: 55vh;
         left: 0;
-        background-color: #ACD4D6;
+        background-color: #373737;
         position: absolute;
         overflow-x: hidden;
 
@@ -243,8 +246,10 @@
   }
   h1 {
     margin-left: 10px;
+    color: #F9F6F1;
   }
   h2{
     margin-left: 10px;
+    color: #F9F6F1;
   }
 </style>
