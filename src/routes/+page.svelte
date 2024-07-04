@@ -33,6 +33,7 @@
 
     // #67001fff,#b2182bff,#d6604dff,#f4a582ff,#fddbc7ff,#f7f7f7ff,#d1e5f0ff,#92c5deff,#4393c3ff,#2166acff,#053061ff
     const colors = ["#67001fff", "#b2182bff", "#d6604dff", "#f4a582ff", "#fddbc7ff", "#f7f7f7ff", "#d1e5f0ff", "#92c5deff", "#4393c3ff", "#2166acff", "#053061ff"];
+    
     const bikeshare = {
         "0521" : bikes0521,
         "0522" : bikes0522,
