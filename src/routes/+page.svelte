@@ -15,6 +15,7 @@
     import bikes0526 from "../data/0526_num_bikes_available.geo.json"
     
 
+
     let days = ["0521", "0522", "0523", "0524", "0525", "0526"]
     let selectedDay = "0521"
     let station = "Union Station";
@@ -29,10 +30,8 @@
     let stationNames = []
     let stationIndex = 31
     let hourMinutes = "00 : 00"
-    //const colors = ["#85c1c8ff", "#90a1beff", "#9c8184ff", "#a761aaff", "#af4980ff", "#b83055ff", "#c0182aff", "#c80000ff", "#d33300ff", "#de6600ff", "#e99900ff", "#f4cc00ff", "#ffff00ff"];
 
-    // #67001fff,#b2182bff,#d6604dff,#f4a582ff,#fddbc7ff,#f7f7f7ff,#d1e5f0ff,#92c5deff,#4393c3ff,#2166acff,#053061ff
-    const colors = ["#67001fff", "#b2182bff", "#d6604dff", "#f4a582ff", "#fddbc7ff", "#f7f7f7ff", "#d1e5f0ff", "#92c5deff", "#4393c3ff", "#2166acff", "#053061ff"];
+    const colors = ["#f5fff2ff", "#b7e3b2ff", "#72c66dff", "#5b9756ff", "#43683fff",  "#3d5439ff"];
     const bikeshare = {
         "0521" : bikes0521,
         "0522" : bikes0522,
@@ -46,11 +45,12 @@
         ["linear"],
         //["get", daytime], 
         ['/', ['get', daytime], ['get', 'Capacity']],
-        0, colors[0], 
-        0.10, colors[1], 0.20, colors[2], 0.30, colors[3], 
-        0.40, colors[4], 0.50, colors[5], 0.60, colors[6], 0.70, colors[7], 
-        0.80, colors[8], 0.90, colors[9], 
-        1.00, colors[10]]
+        0, colors[0], //0.10, colors[1], 
+        0.20, colors[1], //0.30, colors[3], 
+        0.40, colors[2], //0.50, colors[5], 
+        0.60, colors[3], //0.70, colors[7], 
+        0.80, colors[4], //0.90, colors[9], 
+        1.00, colors[5]]
     let circlecolor_count = [
         "interpolate",
         ["linear"],
@@ -61,11 +61,21 @@
 
     async function dayDropDown(){
         //console.log(selectedDay)
-        
-        map.getSource("station").setData(bikeshare[selectedDay]);
-        
+        //get the value of the selected day
         var hr = daytime.split("_")[1]
         daytime = `${selectedDay}_${hr}`
+
+        //update day in circlecolor_perc
+        circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
+
+        map.getSource("station").setData(bikeshare[selectedDay]);
+
+        map.setPaintProperty("bike-count", 'circle-radius', 5);
+        map.setPaintProperty("bike-count", 'circle-color', circlecolor_perc);
+        map.setPaintProperty("bike-count", 'circle-opacity', 0.7);
+
+        
+        
         //console.log(hr)
         //console.log(daytime)
     }
@@ -104,17 +114,11 @@
         return hourMinutes
     }
 
+    function barchartChange(event){
+        console.log()
+    }
+
     onMount(async () => {
-        // Load CSV data
-        ///csv = await d3.csv(`data/${sheet}.csv`);
-        //console.log(csv)
-
-        // get the header of the csv
-        //header = Object.keys(csv[0])   
-        //dataLoaded = handleCsvData(csv, header, day)
-
-        //console.log(csv[0]["Station ID"])
-        console.log(bikes0521)
             
             map = new maplibregl.Map({
                 container: "map",
@@ -144,9 +148,22 @@
                     },
                 });
 
+                map.addLayer({id: "bike-clicked",
+                type: "circle",
+                    source: "station",
+                    filter: ["==", "Name", station],
+                    paint: {
+                        "circle-radius": 5,
+                        "circle-opacity": 0,
+                        "circle-stroke-width": 3,
+                        "circle-stroke-color": "#DC4633",
+
+                    },
+                });
+
                 map.on("click", "bike-count", (e) => {
                     station = e.features[0].properties['Name']
-                    console.log(station)
+                    map.setFilter("bike-clicked", ["==", "Name", station]),
                     capacity = e.features[0].properties['Capacity']
                     bikecount = e.features[0].properties[daytime]
                     stationIndex = stationNames.indexOf(station)
@@ -172,18 +189,7 @@
 <div id="map" class="map" />
 
 <div class = "info-panel">
-    <h1>{station} at {hourMinutes}: </h1>
-    <h2>{bikecount} / {capacity} ({Math.round(bikecount/capacity*10000)/100}%) </h2>
-
-    <!-- Slider -->
-    <div class:purple-theme={theme === "default"}>
-        <Range on:change={(e) => {
-            values = e.detail.value
-            console.log(values)
-            valueTime(values, selectedDay, station)
-            }} 
-            id="basic-slider" />
-    </div>
+    <h1>{station} at {hourMinutes} - {bikecount} / {capacity} ({Math.round(bikecount/capacity*10000)/100}%) </h1>  
     
     <div id="select-wrapper">
         <select bind:value={selectedDay} on:change={dayDropDown}>
@@ -194,7 +200,10 @@
     </div>
     
     {#key stationIndex, bikeshare[selectedDay]}
-    <Chart on:change = {(e) => console.log(e)}
+    <Chart on:change = {(e)=>{
+        bikecount = e.detail.value
+        hourMinutes = e.detail.selecttime
+    }}
         index= {stationIndex}
         data = {bikeshare[selectedDay]}
         yTicks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
@@ -205,6 +214,17 @@
         capacity = {capacity}
     />
     {/key}
+
+    <!-- Slider -->
+    <h2>Time Slider </h2>
+    <div class:purple-theme={theme === "default"}>
+        <Range on:change={(e) => {
+            values = e.detail.value
+            valueTime(values, selectedDay, station)
+            }} 
+            id="basic-slider" />
+    </div>
+
     
 </div>
 
