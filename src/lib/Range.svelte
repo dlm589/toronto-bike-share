@@ -246,7 +246,7 @@
     }
   
     .range__track {
-      height: 6px;
+      height: 12px;
       background-color: var(--track-bgcolor, #d0d0d0);
       border-radius: 999px;
     }
@@ -258,7 +258,7 @@
         linear-gradient(90deg, #6185ff, #9c65ff)
       );
       width: 0;
-      height: 6px;
+      height: 12px;
       position: absolute;
       border-radius: 999px;
     }
@@ -268,12 +268,12 @@
       align-items: center;
       justify-content: center;
       position: absolute;
-      width: 20px;
+      width: 10px;
       height: 20px;
       background-color: var(--thumb-bgcolor, white);
       cursor: pointer;
       border-radius: 999px;
-      margin-top: -8px;
+      margin-top: -4px;
       transition: box-shadow 100ms;
       user-select: none;
       box-shadow: var(

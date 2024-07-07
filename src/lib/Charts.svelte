@@ -1,9 +1,11 @@
 <script>
     import { scaleLinear } from "d3-scale";
+    import { createEventDispatcher } from "svelte";
     import { rollups, sum } from "d3-array";
     import { LogoControl } from "maplibre-gl";
     //import data from "/src/data/growth/data.json";
     //import "../assets/global-styles.css";
+
 
     export let index;
     export let yTicks;
@@ -14,6 +16,21 @@
     export let time;
     export let capacity;
 
+    let value = 30
+    let selecttime = "00:00"
+    // Dispatch 'change' events
+    const dispatch = createEventDispatcher();
+
+    // Allows both bind:value and on:change for parent value retrieval
+    function setValue(val, selectedPoint_i) {
+      value = val;
+      if (selectedPoint_i%12 < 2){
+        selecttime = `${Math.floor(selectedPoint_i/12)}`+" : 0"+`${selectedPoint_i%12*5}`
+      } else {
+        selecttime = `${Math.floor(selectedPoint_i/12)}`+" : "+`${selectedPoint_i%12*5}`
+      }
+      dispatch("change", { value, selecttime });
+    }
     var features = data.features[index];
     var xTicks = Object.keys(features.properties); // get the values for the selected station
     xTicks.splice(xTicks.length - 2, 2); //remove name and capacity from the list
@@ -56,16 +73,9 @@
     var valueList = Object.values(features.properties);
     valueList.splice(valueList.length - 2, 2);
     var values = valueList;
-    /*
-    var values = []
-    valueList.forEach((e, i) =>{
-        if (i%2 === 0){
-            values.push(e)
-        }
-    })
-    */
+
     let width = 100;
-    let height = 60;
+    let height = 600;
 
     $: height = Math.min(width / 2.42, maxHeight);
 
@@ -81,7 +91,7 @@
         .range([padding.left, svgWidth - padding.left - padding.right]);
 
     $: yScale = scaleLinear()
-        .domain([0, Math.max.apply(0, yTicks)])
+        .domain([0, Math.max(...yTicks)])
         .range([height - padding.bottom, padding.top]);
 
     $: innerWidth = width - (padding.left + padding.right);
@@ -98,6 +108,9 @@
         mouse_x = event.clientX;
         mouse_y = event.clientY;
     };
+
+
+
 </script>
 
 <div class="chart-container">
@@ -143,17 +156,14 @@
                     </g>
                 {/each}
             </g>
-
-            <!--
-        {#if type === "bar"}-->
             <g>
                 {#each values as value, i}
                     <rect
                         class="barLight"
                         x={xScale(i) + barPadding}
                         y={yScale(1)}
-                        width={barWidth - 2}
-                        height={yScale(0) - yScale(1)}
+                        width={barWidth}
+                        height={Math.max(yScale(0) - yScale(1),0)}
                         stroke={colour}
                         opacity="0.15"
                         on:mouseover={(event) => {
@@ -169,11 +179,12 @@
                         class="bar"
                         x={xScale(i) + barPadding}
                         y={yScale(value / capacity)}
-                        width={barWidth - 2}
-                        height={yScale(0) - yScale(value / capacity)}
+                        width={barWidth}
+                        height={Math.max(yScale(0) - yScale(value / capacity), 0)}
                         on:mouseover={(event) => {
                             selected_datapoint = value;
                             selected_datapoint_i = i;
+                            setValue(selected_datapoint, selected_datapoint_i)
                             // setMousePosition(event);
                         }}
                         on:mouseout={() => {
@@ -183,8 +194,6 @@
                     />
                 {/each}
             </g>
-            <!--{/if}
-        -->
             <!-- y axis -->
             <g class="axis y-axis">
                 {#each yTicks as tick}
@@ -207,72 +216,8 @@
                     />
                 {/each}
             </g>
-            <!--
-        {#if type === "line"}
-            <g>
-                {#each data as bike, i}
-                    {console.log(bike)}
-                    {#if i > 0 && values !== 0 && data[i - 1][variable] !== 0}
-                        <line
-                            x1={xScale(i - 1) + barPadding + barWidth/2 - 1}
-                            y1={yScale(data[i - 1][variable])}
-                            x2={xScale(i) + barPadding + barWidth/2 - 1}
-                            y2={yScale(values)}
-                            stroke={colour}
-                            stroke-width="2"
-                        />
-                    {/if}
-                    
-                    {#if values !== 0}
-                    {console.log(values)}
-                        <circle
-                            class="point"
-                            r={innerWidth / 300}
-                            cx={xScale(i) + barPadding + barWidth/2 - 1}
-                            cy={yScale(values)}
-                            fill={colour}
-                            on:mouseover={(event) => {
-                                selected_datapoint = bike;
-                                selected_datapoint_i = i;
-                                setMousePosition(event);
-                            }}
-                            on:mouseout={() => {
-                                selected_datapoint = undefined;
-                            }}
-                        />
-
-                        <rect
-                            class="barLight"
-                            x={xScale(i) + barPadding}
-                            y={yScale(values)}
-                            width={barWidth - 2}
-                            height={yScale(0) - yScale(values)}
-                            stroke={colour}
-                            opacity=0.15
-                            on:mouseover={(event) => {
-                                selected_datapoint = bike;
-                                setMousePosition(event);
-                                selected_datapoint_i = i;
-                            }}
-                            on:mouseout={() => {
-                                selected_datapoint = undefined;
-                            }}
-                        />
-                    {/if}
-                {/each}
-            </g>
-        {/if}-->
         </svg>
     </div>
-</div>
-
-<div id="hoverLabel">
-    <p>
-        {#if selected_datapoint != undefined}
-        {Math.floor(selected_datapoint_i/12)}:{minutes[selected_datapoint_i]} - 
-            <span id="lightBlue">{values[selected_datapoint_i]} bikes ({Math.round(values[selected_datapoint_i]/capacity*100)}% Capacity)</span>
-        {/if}
-    </p>
 </div>
 
 <style>
@@ -350,8 +295,8 @@
         cursor: pointer;
     }
     .bar:hover {
-        fill: #e7adac;
-        stroke: #e7adac;
+        fill: #5b9756ff;
+        stroke: #5b9756ff;
         opacity: 1;
     }
     .barLight {
