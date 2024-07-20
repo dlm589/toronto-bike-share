@@ -3,6 +3,7 @@
   // this script is for creating the range bar
     import { createEventDispatcher } from "svelte";
     import { fly, fade } from "svelte/transition";
+    import "../assets/global-styles.css";
   
     // Props
     export let min = 0;

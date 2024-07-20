@@ -7,6 +7,7 @@
     //import stations from "../data/Stations.geo.json";
     //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
+    import "../assets/global-styles.css";
     import bikes0521 from "../data/0521_num_bikes_available.geo.json"
     import bikes0522 from "../data/0522_num_bikes_available.geo.json"
     import bikes0523 from "../data/0523_num_bikes_available.geo.json"
@@ -16,8 +17,8 @@
     
 
 
-    let days = ["0521", "0522", "0523", "0524", "0525", "0526"]
-    let selectedDay = "0521"
+    let days = ["Tuesday, 05/21/2024", "Wednesday, 05/22/2024", "Thursday, 05/23/2024", "Friday, 05/24/2024", "Saturday, 05/25/2024", "Sunday, 05/26/2024"]
+    let selectedDay = "Tuesday, 05/21/2024"
     let station = "Union Station";
     let capacity = 43
 
@@ -40,6 +41,7 @@
         "0525" : bikes0525,
         "0526" : bikes0526
     }
+
     let circlecolor_perc = [
         "interpolate",
         ["linear"],
@@ -59,29 +61,37 @@
         25, colors[5], 30, colors[6], 35, colors[7], 40, colors[8], 45, colors[9],
         50, colors[10]]
 
+    function convertSelectedDay(sDay){
+        sDay = sDay.split(", ")[1]
+        sDay = sDay.replace("/2024", "")
+        sDay = sDay.replace("/", "")
+        console.log(sDay)
+
+        return sDay
+    }
+
     async function dayDropDown(){
         //console.log(selectedDay)
         //get the value of the selected day
+        var sday = convertSelectedDay(selectedDay)
+
+
         var hr = daytime.split("_")[1]
-        daytime = `${selectedDay}_${hr}`
+        daytime = `${sday}_${hr}`
 
         //update day in circlecolor_perc
         circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
 
-        map.getSource("station").setData(bikeshare[selectedDay]);
+        map.getSource("station").setData(bikeshare[sday]);
 
         map.setPaintProperty("bike-count", 'circle-radius', 5);
         map.setPaintProperty("bike-count", 'circle-color', circlecolor_perc);
         map.setPaintProperty("bike-count", 'circle-opacity', 0.7);
 
-        
-        
-        //console.log(hr)
-        //console.log(daytime)
     }
 
     function valueTime(value, day, station){
-
+        var sday = convertSelectedDay(selectedDay)
         const hours = Math.floor(value*5 / 60);
         const minutes = value*5 % 60;
         if (minutes <10 && hours <10){
@@ -103,20 +113,17 @@
             circlecolor_perc[2] = ['/', ['get', daytime], ['get', 'Capacity']]
         }
         stationIndex = stationNames.indexOf(station)
-        bikecount = bikeshare[selectedDay].features[stationIndex].properties[daytime]
+        bikecount = bikeshare[sday].features[stationIndex].properties[daytime]
 
         map.setPaintProperty("bike-count", 'circle-radius', 5);
         map.setPaintProperty("bike-count", 'circle-color', circlecolor_perc);
         map.setPaintProperty("bike-count", 'circle-opacity', 0.7);
 
-        //console.log(daytime)
-
         return hourMinutes
     }
 
-    function barchartChange(event){
-        console.log()
-    }
+    console.log(bikeshare[convertSelectedDay(selectedDay)])
+
 
     onMount(async () => {
             
@@ -184,6 +191,7 @@
                 bikecount = bikes0521.features[stationIndex].properties[daytime]
             });
     });
+    
 </script>
 
 <div id="map" class="map" />
@@ -199,29 +207,28 @@
         </select>
     </div>
     
-    {#key stationIndex, bikeshare[selectedDay]}
+    {#key stationIndex, bikeshare[convertSelectedDay(selectedDay)]}
     <Chart on:change = {(e)=>{
         bikecount = e.detail.value
         hourMinutes = e.detail.selecttime
+        values = e.detail.selected_i
+        valueTime(values, convertSelectedDay(selectedDay), station)
     }}
         index= {stationIndex}
-        data = {bikeshare[selectedDay]}
+        data = {bikeshare[convertSelectedDay(selectedDay)]}
         yTicks={[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]}
-        colour="#F1C500"
         maxHeight="250"
-        type="line"
-        time = {daytime}
         capacity = {capacity}
     />
     {/key}
 
     <!-- Slider -->
-    <h2>Time Slider </h2>
+    <h2>Time Slider {hourMinutes}</h2>
     <div class:purple-theme={theme === "default"}>
         <Range on:change={(e) => {
             values = e.detail.value
-            valueTime(values, selectedDay, station)
-            }} 
+
+            valueTime(values, convertSelectedDay(selectedDay), station)}} 
             id="basic-slider" />
     </div>
 
@@ -237,39 +244,42 @@
         position: absolute;
         overflow: hidden;
     }
+
     .info-panel {
         height: 45vh;
         width: 100vw;
         top: 55vh;
         left: 0;
-        background-color: #373737;
+        background-color: rgba(55,55,55);
         position: absolute;
         overflow-x: hidden;
-
-        
-
     }
+
     select {
-        width: 25vw;
-        height: 25px;
-        font-family: TradeGothicBold;
+        width: auto;
+        height: auto;
         font-size: 16px;
-        color: #6d247a;
-        border-width: 0px;
+        color: #F9F6F1;
         margin-right: 5px;
+        margin-bottom: 5px;
+        background: rgba(55,55,55);
         margin-left: 10px;
         padding-left: 10px;
         padding-top: 3px;
         padding-bottom: 3px;
-        border-radius: 0;
-        border: 1px;
   }
+
   h1 {
     margin-left: 10px;
     color: #F9F6F1;
   }
+
   h2{
     margin-left: 10px;
     color: #F9F6F1;
+  }
+
+  option{
+    font-family: RobotoRegular
   }
 </style>

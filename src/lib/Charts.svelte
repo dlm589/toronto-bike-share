@@ -3,21 +3,16 @@
     import { createEventDispatcher } from "svelte";
     import { rollups, sum } from "d3-array";
     import { LogoControl } from "maplibre-gl";
-    //import data from "/src/data/growth/data.json";
-    //import "../assets/global-styles.css";
-
 
     export let index;
     export let yTicks;
-    export let colour;
     export let maxHeight;
-    export let type;
     export let data;
-    export let time;
     export let capacity;
 
     let value = 30
     let selecttime = "00:00"
+    let selected_i = 0
     // Dispatch 'change' events
     const dispatch = createEventDispatcher();
 
@@ -29,44 +24,27 @@
       } else {
         selecttime = `${Math.floor(selectedPoint_i/12)}`+" : "+`${selectedPoint_i%12*5}`
       }
-      dispatch("change", { value, selecttime });
+        selected_i = selectedPoint_i
+      dispatch("change", { value, selecttime , selected_i});
     }
+
+    console.log(index)
+    console.log(data)
     var features = data.features[index];
     var xTicks = Object.keys(features.properties); // get the values for the selected station
     xTicks.splice(xTicks.length - 2, 2); //remove name and capacity from the list
 
     var hour = [
-        "00",
-        "01",
-        "02",
-        "03",
-        "04",
-        "05",
-        "06",
-        "07",
-        "08",
-        "09",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
+        "00","01","02","03",
+        "04","05","06","07",
+        "08","09","10","11",
+        "12","13","14","15",
+        "16","17","18","19",
+        "20","21","22","23",
     ];
     var minutes = [];
 
     xTicks.forEach((e, i) => {
-        /*if (i%2 ===0){
-            minutes.push(e.substring(7,8))
-        }*/
         minutes.push(e.substring(7, 9));
     });
 
@@ -83,6 +61,8 @@
 
     var barWidth = 14;
 
+    // this is for calculating the width of the chart 
+    // calculating the sum of the bar widths and the gaps between the bars
     var svgWidth = xTicks.length * barWidth + xTicks.length * 6;
 
 
@@ -108,8 +88,6 @@
         mouse_x = event.clientX;
         mouse_y = event.clientY;
     };
-
-
 
 </script>
 
@@ -158,23 +136,7 @@
             </g>
             <g>
                 {#each values as value, i}
-                    <rect
-                        class="barLight"
-                        x={xScale(i) + barPadding}
-                        y={yScale(1)}
-                        width={barWidth}
-                        height={Math.max(yScale(0) - yScale(1),0)}
-                        stroke={colour}
-                        opacity="0.15"
-                        on:mouseover={(event) => {
-                            selected_datapoint = value;
-                            setMousePosition(event);
-                            selected_datapoint_i = i;
-                        }}
-                        on:mouseout={() => {
-                            selected_datapoint = undefined;
-                        }}
-                    />
+                    
                     <rect
                         class="bar"
                         x={xScale(i) + barPadding}
@@ -185,13 +147,33 @@
                             selected_datapoint = value;
                             selected_datapoint_i = i;
                             setValue(selected_datapoint, selected_datapoint_i)
-                            // setMousePosition(event);
                         }}
                         on:mouseout={() => {
                             selected_datapoint = undefined;
                         }}
-                        color={colour}
+
                     />
+
+                    <rect
+                        class="barLight"
+                        x={xScale(i) + barPadding}
+                        y={yScale(1)}
+                        width={barWidth}
+                        height={Math.max(yScale(0) - yScale(1),0)}
+
+                        on:mouseover={(event) => {
+                            selected_datapoint = value;
+                            setMousePosition(event);
+                            selected_datapoint_i = i;
+                            setValue(selected_datapoint, selected_datapoint_i)
+                        }}
+                        on:mouseout={() => {
+                            selected_datapoint = undefined;
+                        }}
+
+                        
+                    />
+                   
                 {/each}
             </g>
             <!-- y axis -->
@@ -224,27 +206,13 @@
     .chart-container {
         overflow-x: auto;
     }
+    
     .chart {
         width: 100%;
         min-width: 300px;
         margin: 0 auto;
         margin-left: 10px;
         margin-right: 10px;
-    }
-    #hoverLabel {
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    #hoverLabel p {
-        color: #F9F6F1;
-        font-family: RobotoRegular;
-        font-size: 16px;
-        text-align: center;
-    }
-    #lightBlue {
-        color: var(--brandLightBlue);
     }
 
     svg {
@@ -255,17 +223,20 @@
         font-family: RobotoRegular;
         font-size: 0.725em;
         font-weight: 200;
+        text-align: right;
     }
 
     .tick line {
         stroke: #F9F6F1;
         stroke-width: 1px;
-        opacity: 0.1;
+        opacity: 1;
     }
+
     .tick text {
         fill: #F9F6F1;
         text-anchor: start;
         font-size: 12px;
+        text-align: right;
     }
 
     .tick.tick-0 line {
@@ -281,47 +252,33 @@
     .x-label {
         text-anchor: middle;
         transform: translate(-10px, 0px) rotate(-90deg);
+        text-align: right;
     }
+
     .x-label.tick text {
         font-size: 20px; /* Adjust the font size as desired */
         fill: #000000; /* Adjust the font color as desired */
+        text-align: right;
     }
 
     .bar {
-        stroke: #F9F6F1;
-        stroke-width: 1px;
-        stroke-opacity: 1;
-        fill: #F9F6F1;
+
+        fill: white;
+        opacity: 0.5;
         cursor: pointer;
     }
-    .bar:hover {
-        fill: #5b9756ff;
-        stroke: #5b9756ff;
-        opacity: 1;
-    }
+
     .barLight {
-        stroke-width: 1px;
-        stroke-opacity: 0;
+        opacity: 0;
     }
 
     .barLight:hover {
-        stroke-width: 3px;
-        stroke-opacity: 1;
-        stroke: yellow;
-    }
-
-    .point {
-        cursor: pointer;
-    }
-    .point:hover {
-        fill: var(--brandLightBlue);
+        stroke: #FFBF00;
+        fill: rgba(0,0,0,0);
+        stroke-width: 2px;
         opacity: 1;
     }
-    .tip {
-        stroke: var(--brandDarkGreen);
-        stroke-width: 1px;
-        fill: var(--brandYellow);
-    }
+    
     .year-tick {
         stroke-width: 2px;
         z-index: 6;
