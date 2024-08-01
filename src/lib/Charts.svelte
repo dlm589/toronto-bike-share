@@ -28,8 +28,6 @@
       dispatch("change", { value, selecttime , selected_i});
     }
 
-    console.log(index)
-    console.log(data)
     var features = data.features[index];
     var xTicks = Object.keys(features.properties); // get the values for the selected station
     xTicks.splice(xTicks.length - 2, 2); //remove name and capacity from the list
@@ -114,13 +112,13 @@
                     <g class="tick">
                         <text
                             x={xScale(i * 12) +
-                                13 +
+                                18 +
                                 barPadding -
                                 innerWidth / 600}
                             y={height - 5}
                             text-anchor="end"
                         >
-                            {hr}
+                            {hr} hr
                         </text>
                     </g>
                 {/each}
@@ -180,10 +178,9 @@
             <g class="axis y-axis">
                 {#each yTicks as tick}
                     <g
-                        class="tick tick-{tick}"
+                        class="tick" 
                     >
-                        <line x2="100%" />
-                        <text y={yScale(tick)}>{tick * 100} </text>
+                        <text y={yScale(tick)+3} >{tick * 100} </text>
                     </g>
                     <line
                         class="year-grid"
@@ -213,10 +210,12 @@
         margin: 0 auto;
         margin-left: 10px;
         margin-right: 10px;
+        text-align: right;
     }
 
     svg {
         position: relative;
+        text-align: right;
     }
 
     .tick {
@@ -228,6 +227,7 @@
 
     .tick line {
         stroke: #F9F6F1;
+        text-align: right;
         stroke-width: 1px;
         opacity: 1;
     }
@@ -241,6 +241,7 @@
 
     .tick.tick-0 line {
         stroke-dasharray: 0;
+        text-align: right;
     }
 
     .x-axis .tick text {
