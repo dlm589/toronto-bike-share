@@ -245,20 +245,22 @@
     <div class="header">
         <h2>On</h2>
         &nbsp
-        <div id="select-wrapper">
             <select bind:value={selectedDay} on:change={dayDropDown}>
                 {#each days as day}
                     <option>{day}</option>
                 {/each}
             </select>
-        </div>
-        &nbsp
-        <h2>
+
+        <br>&nbsp
+        <div class = "second-line"><h2>
             at {hourMinutes} - {bikecount} bikes / {capacity} docks ({Math.round(
                 (bikecount / capacity) * 10000,
             ) / 100}%)
         </h2>
     </div>
+    </div>
+    
+
     {#key (stationIndex, bikeshare[convertSelectedDay(selectedDay)])}
         <Chart
             on:change={(e) => {
@@ -360,23 +362,39 @@
         position: absolute;
         overflow-x: hidden;
     }
-    .header {
-        display: flex;
-        align-items: center;
-        padding-left: 10px;
-        color: #f9f6f1;
-        font-size: 20px;
-    }
 
-    select {
-        width: auto;
-        height: auto;
-        font-size: 20px;
-        color: var(--brandYellow);
-        font-family: TradeGothicBold;
-        background: rgba(55, 55, 55);
-        border: rgba(55, 55, 55);
-    }
+    .header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-left: 10px;
+    color: #f9f6f1;
+    font-size: 20px;
+}
+
+.header select {
+    width: auto;
+    height: auto;
+    font-size: 20px;
+    color: var(--brandYellow);
+    font-family: TradeGothicBold;
+    background: rgba(55, 55, 55);
+    border: none;
+}
+
+.header .second-line {
+    flex-basis: 100%;
+    padding-top: 10px;
+}
+
+.header h2 {
+    margin: 0;
+}
+
+.header .second-line h2 {
+    padding-left: 10px;
+}
+
     h2 {
         padding-left: 10px;
     }
