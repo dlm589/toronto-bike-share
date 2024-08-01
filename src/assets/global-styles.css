@@ -26,7 +26,7 @@
 	--brandRed: #DC4633; 
 	--brandYellow: #F1C500;
 	--brandBlack: #000000;
-	--brandWhite: #ffffff;
+	--brandWhite: #F9F6F1;
 	--brandGray: #D0D1C9;
 	--brandGray70: #4d4d4d;
 	--brandGray80: #333333;
@@ -77,9 +77,11 @@ main {
 	z-index: 8;
 }
 
+
 h1 {
 	font-family: TradeGothicBold;
 	font-size: 32px;
+	margin-left: 10px;
 	color: var(--brandWhite);
 	padding-top: 0px;
 	padding-bottom: 0px;
@@ -89,7 +91,9 @@ h1 {
 h2 {
 	text-align: left;
 	font-family: TradeGothicBold;
-	font-size: 30px;
+	font-size: 20px;
+	left: 10px;
+	
 	color: var(--brandWhite);
 }
 

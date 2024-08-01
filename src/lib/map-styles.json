@@ -88,7 +88,7 @@
         ]
       ],
       "layout": {
-        "visibility": "visible"
+        "visibility": "none"
       },
       "paint": {
         "fill-color": {
@@ -4043,7 +4043,7 @@
       "source": "carto",
       "source-layer": "building",
       "layout": {
-        "visibility": "visible"
+        "visibility": "none"
       },
       "paint": {
         "fill-color": {
@@ -4051,11 +4051,11 @@
           "stops": [
             [
               15.5,
-              "#dfdfdf"
+              "#D3D3D3"
             ],
             [
               16,
-              "#dfdfdf"
+              "#D3D3D3"
             ]
           ]
         },
@@ -4068,7 +4068,7 @@
       "source": "carto",
       "source-layer": "building",
       "layout": {
-        "visibility": "visible"
+        "visibility": "none"
       },
       "paint": {
         "fill-translate": {
@@ -4091,7 +4091,7 @@
           ]
         },
         "fill-outline-color": "#dfdfdf",
-        "fill-color": "#ededed",
+        "fill-color": "#D3D3D3",
         "fill-opacity": {
           "base": 1,
           "stops": [
