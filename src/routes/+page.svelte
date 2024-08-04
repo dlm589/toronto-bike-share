@@ -8,26 +8,28 @@
     //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
     import "../assets/global-styles.css";
-    import bikes0521 from "../data/0521_num_bikes_available.geo.json";
-    import bikes0522 from "../data/0522_num_bikes_available.geo.json";
-    import bikes0523 from "../data/0523_num_bikes_available.geo.json";
-    import bikes0524 from "../data/0524_num_bikes_available.geo.json";
-    import bikes0525 from "../data/0525_num_bikes_available.geo.json";
-    import bikes0526 from "../data/0526_num_bikes_available.geo.json";
+    import bikes_day1 from "../data/0617_num_bikes_available.geo.json";
+    import bikes_day2 from "../data/0618_num_bikes_available.geo.json";
+    import bikes_day3 from "../data/0619_num_bikes_available.geo.json";
+    import bikes_day4 from "../data/0620_num_bikes_available.geo.json";
+    import bikes_day5 from "../data/0621_num_bikes_available.geo.json";
+    import bikes_day6 from "../data/0622_num_bikes_available.geo.json";
+    import bikes_day7 from "../data/0623_num_bikes_available.geo.json";
 
     let days = [
-        "Tuesday, 05/21/2024",
-        "Wednesday, 05/22/2024",
-        "Thursday, 05/23/2024",
-        "Friday, 05/24/2024",
-        "Saturday, 05/25/2024",
-        "Sunday, 05/26/2024",
+        "Monday, 06/17/2024",
+        "Tuesday, 06/18/2024",
+        "Wednesday, 06/19/2024",
+        "Thursday, 06/20/2024",
+        "Friday, 06/21/2024",
+        "Saturday, 06/22/2024",
+        "Sunday, 06/23/2024",
     ];
-    let selectedDay = "Tuesday, 05/21/2024";
+    let selectedDay = "Monday, 06/17/2024";
     let station = "Union Station";
     let capacity = 43;
 
-    let daytime = "0521_0000";
+    let daytime = "0617_0000";
     let bikecount;
 
     let map;
@@ -46,12 +48,13 @@
         "#3d5439ff",
     ];
     const bikeshare = {
-        "0521": bikes0521,
-        "0522": bikes0522,
-        "0523": bikes0523,
-        "0524": bikes0524,
-        "0525": bikes0525,
-        "0526": bikes0526,
+        "0617": bikes_day1,
+        "0618": bikes_day2,
+        "0619": bikes_day3,
+        "0620": bikes_day4,
+        "0621": bikes_day5,
+        "0622": bikes_day6,
+        "0623": bikes_day6
     };
 
     let circlecolor_perc = [
@@ -174,7 +177,7 @@
             //adding the station, the data is determined either the "origin" or "destination" data input.
             map.addSource("station", {
                 type: "geojson",
-                data: bikes0521,
+                data: bikes_day1,
             });
 
             map.addLayer({
@@ -217,13 +220,13 @@
                 map.getCanvas().style.cursor = "";
             });
 
-            for (let i = 0; i < bikes0521.features.length; i++) {
-                //console.log(i,bikes0521.features[i].properties.Name)
-                stationNames.push(bikes0521.features[i].properties.Name);
+            for (let i = 0; i < bikes_day1.features.length; i++) {
+                //console.log(i,bikes_day1.features[i].properties.Name)
+                stationNames.push(bikes_day1.features[i].properties.Name);
             }
 
             stationIndex = stationNames.indexOf(station);
-            bikecount = bikes0521.features[stationIndex].properties[daytime];
+            bikecount = bikes_day1.features[stationIndex].properties[daytime];
         });
     });
 </script>
