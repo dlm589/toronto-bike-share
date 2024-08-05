@@ -8,28 +8,50 @@
     //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
     import "../assets/global-styles.css";
-    import bikes_day1 from "../data/0617_num_bikes_available.geo.json";
-    import bikes_day2 from "../data/0618_num_bikes_available.geo.json";
-    import bikes_day3 from "../data/0619_num_bikes_available.geo.json";
-    import bikes_day4 from "../data/0620_num_bikes_available.geo.json";
-    import bikes_day5 from "../data/0621_num_bikes_available.geo.json";
-    import bikes_day6 from "../data/0622_num_bikes_available.geo.json";
-    import bikes_day7 from "../data/0623_num_bikes_available.geo.json";
+    import bikes_day1 from "../data/0521_num_bikes_available.geo.json";
+    import bikes_day2 from "../data/0522_num_bikes_available.geo.json";
+    import bikes_day3 from "../data/0523_num_bikes_available.geo.json";
+    import bikes_day4 from "../data/0524_num_bikes_available.geo.json";
+    import bikes_day5 from "../data/0525_num_bikes_available.geo.json";
+    import bikes_day6 from "../data/0526_num_bikes_available.geo.json";
+    //import bikes_day7 from "../data/0623_num_bikes_available.geo.json";
 
+    
+    let day1 = "0521"
+    let day2 = "0522"
+    let day3 = "0523"
+    let day4 = "0524"
+    let day5 = "0525"
+    let day6 = "0526"
+    //let day7 = "0623"
+
+    const bikeshare = {
+        "0521" : bikes_day1,
+        "0522" : bikes_day2,
+        "0523" : bikes_day3,
+        "0524" : bikes_day4,
+        "0525" : bikes_day5,
+        "0526" : bikes_day6,
+        //"0623" : bikes_day7
+    };
+
+    console.log(bikeshare)
     let days = [
-        "Monday, 06/17/2024",
-        "Tuesday, 06/18/2024",
-        "Wednesday, 06/19/2024",
-        "Thursday, 06/20/2024",
-        "Friday, 06/21/2024",
-        "Saturday, 06/22/2024",
-        "Sunday, 06/23/2024",
+        `Monday, ${day1.substring(0,2)}/${day1.substring(2,5)}/2024`,
+        `Tuesday, ${day2.substring(0,2)}/${day2.substring(2,5)}/2024`,
+        `Wednesday, ${day3.substring(0,2)}/${day3.substring(2,5)}/2024`,
+        `Thursday, ${day4.substring(0,2)}/${day4.substring(2,5)}/2024`,
+        `Friday, ${day5.substring(0,2)}/${day5.substring(2,5)}/2024`,
+        `Saturday, ${day6.substring(0,2)}/${day6.substring(2,5)}/2024`,
+        //`Sunday, ${day7.substring(0,2)}/${day7.substring(2,5)}/2024`,
     ];
-    let selectedDay = "Monday, 06/17/2024";
+
+    let selectedDay = `Monday, ${day1.substring(0,2)}/${day1.substring(2,5)}/2024`;
+    console.log(selectedDay)
     let station = "Union Station";
     let capacity = 43;
 
-    let daytime = "0617_0000";
+    let daytime = `${day1}_0000`;
     let bikecount;
 
     let map;
@@ -47,15 +69,7 @@
         "#43683fff",
         "#3d5439ff",
     ];
-    const bikeshare = {
-        "0617": bikes_day1,
-        "0618": bikes_day2,
-        "0619": bikes_day3,
-        "0620": bikes_day4,
-        "0621": bikes_day5,
-        "0622": bikes_day6,
-        "0623": bikes_day6
-    };
+    
 
     let circlecolor_perc = [
         "interpolate",
@@ -118,18 +132,20 @@
         var sday = convertSelectedDay(selectedDay);
         var hr = daytime.split("_")[1];
         daytime = `${sday}_${hr}`;
+        console.log(daytime)
+        console.log(sday)
         //update day in circlecolor_perc
         circlecolor_perc[2] = ["/", ["get", daytime], ["get", "Capacity"]];
 
         map.getSource("station").setData(bikeshare[sday]);
-
+        console.log(sday)
+        console.log(bikeshare[sday])
         map.setPaintProperty("bike-count", "circle-radius", 5);
         map.setPaintProperty("bike-count", "circle-color", circlecolor_perc);
         map.setPaintProperty("bike-count", "circle-opacity", 0.7);
     }
 
     function valueTime(value, day, station) {
-        console.log(value);
         var sday = convertSelectedDay(selectedDay);
         const hours = Math.floor((value * 5) / 60);
         const minutes = (value * 5) % 60;
@@ -165,8 +181,8 @@
         map = new maplibregl.Map({
             container: "map",
             style: map_styles, //'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-            center: [-79.4, 43.65], // starting position
-            minZoom: 11,
+            center: [-79.4, 43.69], // starting position
+            minZoom: 10,
             maxZoom: 19,
             scrollZoom: true,
             attributionControl: false,
