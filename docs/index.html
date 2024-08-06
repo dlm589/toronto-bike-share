@@ -4,11 +4,12 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="./favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Bike Share Toronto Availability</title>
 		
-		<link rel="modulepreload" href="./_app/immutable/entry/start.B1xo7fUb.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/entry.CpArqVyk.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.BLpS9j4y.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/entry.BWtO_twW.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/scheduler.-QPcFtgN.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.B_gGK3VL.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.CYg6A-bJ.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/index.BOJ1k8iC.js">
 		<meta name="description" content="Visualizing Bike Share Toronto's Bike Availability">
 		<meta name="author" content="Michael Liu">
@@ -20,11 +21,20 @@
 		<meta property="og:image" content="https://dlm589.github.io/toronto-bike-share/web-card.png" />
 		<meta property="og:locale" content="en_CA">
 	</head>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-XB09CWTEWB"></script>
+<script>
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-XB09CWTEWB');
+</script>
+
+
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
 			<script>
 				{
-					__sveltekit_14odyrb = {
+					__sveltekit_fmgcey = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						assets: "/toront-bike-share"
 					};
@@ -32,8 +42,8 @@
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.B1xo7fUb.js"),
-						import("./_app/immutable/entry/app.B_gGK3VL.js")
+						import("./_app/immutable/entry/start.BLpS9j4y.js"),
+						import("./_app/immutable/entry/app.CYg6A-bJ.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element);
 					});
