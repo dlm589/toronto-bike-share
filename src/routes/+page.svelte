@@ -8,26 +8,49 @@
     //import bikeshare from "../data/Stations.geo.json"
     import * as d3 from "d3";
     import "../assets/global-styles.css";
-    import bikes0521 from "../data/0521_num_bikes_available.geo.json";
-    import bikes0522 from "../data/0522_num_bikes_available.geo.json";
-    import bikes0523 from "../data/0523_num_bikes_available.geo.json";
-    import bikes0524 from "../data/0524_num_bikes_available.geo.json";
-    import bikes0525 from "../data/0525_num_bikes_available.geo.json";
-    import bikes0526 from "../data/0526_num_bikes_available.geo.json";
+    import bikes_day1 from "../data/0521_num_bikes_available.geo.json";
+    import bikes_day2 from "../data/0522_num_bikes_available.geo.json";
+    import bikes_day3 from "../data/0523_num_bikes_available.geo.json";
+    import bikes_day4 from "../data/0524_num_bikes_available.geo.json";
+    import bikes_day5 from "../data/0525_num_bikes_available.geo.json";
+    import bikes_day6 from "../data/0526_num_bikes_available.geo.json";
+    //import bikes_day7 from "../data/0623_num_bikes_available.geo.json";
 
+    let day1 = "0521";
+    let day2 = "0522";
+    let day3 = "0523";
+    let day4 = "0524";
+    let day5 = "0525";
+    let day6 = "0526";
+    //let day7 = "0623"
+
+    const bikeshare = {
+        "0521": bikes_day1,
+        "0522": bikes_day2,
+        "0523": bikes_day3,
+        "0524": bikes_day4,
+        "0525": bikes_day5,
+        "0526": bikes_day6,
+        //"0623" : bikes_day7
+    };
+
+    console.log(bikeshare);
     let days = [
-        "Tuesday, 05/21/2024",
-        "Wednesday, 05/22/2024",
-        "Thursday, 05/23/2024",
-        "Friday, 05/24/2024",
-        "Saturday, 05/25/2024",
-        "Sunday, 05/26/2024",
+        `Monday, ${day1.substring(0, 2)}/${day1.substring(2, 5)}/2024`,
+        `Tuesday, ${day2.substring(0, 2)}/${day2.substring(2, 5)}/2024`,
+        `Wednesday, ${day3.substring(0, 2)}/${day3.substring(2, 5)}/2024`,
+        `Thursday, ${day4.substring(0, 2)}/${day4.substring(2, 5)}/2024`,
+        `Friday, ${day5.substring(0, 2)}/${day5.substring(2, 5)}/2024`,
+        `Saturday, ${day6.substring(0, 2)}/${day6.substring(2, 5)}/2024`,
+        //`Sunday, ${day7.substring(0,2)}/${day7.substring(2,5)}/2024`,
     ];
-    let selectedDay = "Tuesday, 05/21/2024";
+
+    let selectedDay = `Monday, ${day1.substring(0, 2)}/${day1.substring(2, 5)}/2024`;
+    console.log(selectedDay);
     let station = "Union Station";
     let capacity = 43;
 
-    let daytime = "0521_0000";
+    let daytime = `${day1}_0000`;
     let bikecount;
 
     let map;
@@ -45,14 +68,6 @@
         "#43683fff",
         "#3d5439ff",
     ];
-    const bikeshare = {
-        "0521": bikes0521,
-        "0522": bikes0522,
-        "0523": bikes0523,
-        "0524": bikes0524,
-        "0525": bikes0525,
-        "0526": bikes0526,
-    };
 
     let circlecolor_perc = [
         "interpolate",
@@ -115,18 +130,20 @@
         var sday = convertSelectedDay(selectedDay);
         var hr = daytime.split("_")[1];
         daytime = `${sday}_${hr}`;
+        console.log(daytime);
+        console.log(sday);
         //update day in circlecolor_perc
         circlecolor_perc[2] = ["/", ["get", daytime], ["get", "Capacity"]];
 
         map.getSource("station").setData(bikeshare[sday]);
-
+        console.log(sday);
+        console.log(bikeshare[sday]);
         map.setPaintProperty("bike-count", "circle-radius", 5);
         map.setPaintProperty("bike-count", "circle-color", circlecolor_perc);
         map.setPaintProperty("bike-count", "circle-opacity", 0.7);
     }
 
     function valueTime(value, day, station) {
-        console.log(value);
         var sday = convertSelectedDay(selectedDay);
         const hours = Math.floor((value * 5) / 60);
         const minutes = (value * 5) % 60;
@@ -162,8 +179,8 @@
         map = new maplibregl.Map({
             container: "map",
             style: map_styles, //'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-            center: [-79.4, 43.65], // starting position
-            minZoom: 11,
+            center: [-79.4, 43.69], // starting position
+            minZoom: 10,
             maxZoom: 19,
             scrollZoom: true,
             attributionControl: false,
@@ -174,7 +191,7 @@
             //adding the station, the data is determined either the "origin" or "destination" data input.
             map.addSource("station", {
                 type: "geojson",
-                data: bikes0521,
+                data: bikes_day1,
             });
 
             map.addLayer({
@@ -217,13 +234,13 @@
                 map.getCanvas().style.cursor = "";
             });
 
-            for (let i = 0; i < bikes0521.features.length; i++) {
-                //console.log(i,bikes0521.features[i].properties.Name)
-                stationNames.push(bikes0521.features[i].properties.Name);
+            for (let i = 0; i < bikes_day1.features.length; i++) {
+                //console.log(i,bikes_day1.features[i].properties.Name)
+                stationNames.push(bikes_day1.features[i].properties.Name);
             }
 
             stationIndex = stationNames.indexOf(station);
-            bikecount = bikes0521.features[stationIndex].properties[daytime];
+            bikecount = bikes_day1.features[stationIndex].properties[daytime];
         });
     });
 </script>
@@ -245,21 +262,21 @@
     <div class="header">
         <h2>On</h2>
         &nbsp
-            <select bind:value={selectedDay} on:change={dayDropDown}>
-                {#each days as day}
-                    <option>{day}</option>
-                {/each}
-            </select>
+        <select bind:value={selectedDay} on:change={dayDropDown}>
+            {#each days as day}
+                <option>{day}</option>
+            {/each}
+        </select>
 
-        <br>&nbsp
-        <div class = "second-line"><h2>
-            at {hourMinutes} - {bikecount} bikes / {capacity} docks ({Math.round(
-                (bikecount / capacity) * 10000,
-            ) / 100}%)
-        </h2>
+        <br />&nbsp
+        <div class="second-line">
+            <h2>
+                at {hourMinutes} - {bikecount} bikes / {capacity} docks ({Math.round(
+                    (bikecount / capacity) * 10000,
+                ) / 100}%)
+            </h2>
+        </div>
     </div>
-    </div>
-    
 
     {#key (stationIndex, bikeshare[convertSelectedDay(selectedDay)])}
         <Chart
@@ -288,13 +305,37 @@
             id="basic-slider"
         />
     </div>
+
     <h1>About This Project</h1>
+    <p>Map Created by: &nbsp<a href = "www.linkedin.com/in/chun-fu-liu">Michael Liu </a></p> 
     <p>
-        Biking has become increasingly more convenient in the city. Bike Share Toronto has also seen its ridership increase every year. As a Bike Share user, I really enjoy the convenience of this system. However, there are times when it is difficult to find a bike to borrow or an empty dock to return a bike to. To understand this issue on a larger scale, I collected Bike Share Toronto's bike availability data at 5-minute intervals for (almost) a week in May and tried to visualize the data. The information is pulled from Bike Share Toronto's API.
+        Biking has become increasingly more convenient in the city. Bike Share
+        Toronto has also seen its ridership increase every year. As a Bike Share
+        user, I really enjoy the convenience of this system. However, there are
+        times when it is difficult to find a bike to borrow or an empty dock to
+        return a bike to. To understand this issue on a larger scale, I
+        collected Bike Share Toronto's bike availability data at 5-minute
+        intervals for (almost) a week in May and tried to visualize the data.
+        The information is pulled from Bike Share Toronto's API.
     </p>
     <h2>What Did I See? Population Flow!</h2>
     <p>
-        From playing around with the slider and scrolling through the bar chart, the changing colors of the bike stations show influxes of Toronto's population in and out of Downtown Toronto. On weekdays, the bikes are dispersed in the morning and gradually flow into Downtown Toronto during the morning rush hour. It can be clearly seen that after 9:00 AM, many of the Bike Share stations are at 100% capacity while bike stations in the inner residential suburbs are nearly empty. The stations remain at nearly full capacity, with minor changes during lunch hours (12-1) as users might ride bikes to move within Downtown. However, these users can have a more difficult time returning the bikes as most stations are still at full or nearly full capacity. The next major flow starts around 5:00 PM, when bikes are taken out of Downtown. By that time, Downtown's Bike Share stations are empty or almost empty and will continue to have low bike availability until the rush hour the next morning. Meanwhile, in the inner suburbs of Downtown Toronto, stations are gradually filled up.
+        From playing around with the slider and scrolling through the bar chart,
+        the changing colors of the bike stations show influxes of Toronto's
+        population in and out of Downtown Toronto. On weekdays, the bikes are
+        dispersed in the morning and gradually flow into Downtown Toronto during
+        the morning rush hour. It can be clearly seen that after 9:00 AM, many
+        of the Bike Share stations are at 100% capacity while bike stations in
+        the inner residential suburbs are nearly empty. The stations remain at
+        nearly full capacity, with minor changes during lunch hours (12-1) as
+        users might ride bikes to move within Downtown. However, these users can
+        have a more difficult time returning the bikes as most stations are
+        still at full or nearly full capacity. The next major flow starts around
+        5:00 PM, when bikes are taken out of Downtown. By that time, Downtown's
+        Bike Share stations are empty or almost empty and will continue to have
+        low bike availability until the rush hour the next morning. Meanwhile,
+        in the inner suburbs of Downtown Toronto, stations are gradually filled
+        up.
     </p>
     <p></p>
 </div>
@@ -364,36 +405,36 @@
     }
 
     .header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    padding-left: 10px;
-    color: #f9f6f1;
-    font-size: 20px;
-}
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        padding-left: 10px;
+        color: #f9f6f1;
+        font-size: 20px;
+    }
 
-.header select {
-    width: auto;
-    height: auto;
-    font-size: 20px;
-    color: var(--brandYellow);
-    font-family: TradeGothicBold;
-    background: rgba(55, 55, 55);
-    border: none;
-}
+    .header select {
+        width: auto;
+        height: auto;
+        font-size: 20px;
+        color: var(--brandYellow);
+        font-family: TradeGothicBold;
+        background: rgba(55, 55, 55);
+        border: none;
+    }
 
-.header .second-line {
-    flex-basis: 100%;
-    padding-top: 10px;
-}
+    .header .second-line {
+        flex-basis: 100%;
+        padding-top: 10px;
+    }
 
-.header h2 {
-    margin: 0;
-}
+    .header h2 {
+        margin: 0;
+    }
 
-.header .second-line h2 {
-    padding-left: 10px;
-}
+    .header .second-line h2 {
+        padding-left: 10px;
+    }
 
     h2 {
         padding-left: 10px;

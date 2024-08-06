@@ -28,6 +28,7 @@
       dispatch("change", { value, selecttime , selected_i});
     }
 
+
     var features = data.features[index];
     var xTicks = Object.keys(features.properties); // get the values for the selected station
     xTicks.splice(xTicks.length - 2, 2); //remove name and capacity from the list
